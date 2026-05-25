@@ -4,9 +4,9 @@ import numpy as np
 import joblib
 import matplotlib.pyplot as plt
 
-# ==================================
+# =====================================================
 # PAGE CONFIG
-# ==================================
+# =====================================================
 
 st.set_page_config(
     page_title="Titanic AI Prediction",
@@ -14,11 +14,12 @@ st.set_page_config(
     layout="wide"
 )
 
-# ==================================
-# CUSTOM STYLING
-# ==================================
+# =====================================================
+# CSS
+# =====================================================
 
 st.markdown("""
+
 <style>
 
 .main{
@@ -26,32 +27,37 @@ background-color:#0E1117;
 }
 
 .title{
-font-size:40px;
+font-size:42px;
 font-weight:bold;
 color:#00D4FF;
 }
 
 .subtitle{
-font-size:18px;
-color:#C0C0C0;
+font-size:20px;
+color:#D3D3D3;
 }
 
-.card{
-padding:20px;
-border-radius:15px;
-background-color:#1E1E1E;
-box-shadow:2px 2px 8px gray;
+.metric-card{
+
+padding:15px;
+
+border-radius:10px;
+
+background:#1E1E1E;
+
 }
 
 </style>
+
 """,unsafe_allow_html=True)
 
-# ==================================
+# =====================================================
 # LOAD MODEL
-# ==================================
+# =====================================================
 
 @st.cache_resource
-def load_files():
+
+def load_model():
 
     model=tf.keras.models.load_model(
         "titanic_ann_model.keras"
@@ -65,33 +71,19 @@ def load_files():
 
 try:
 
-    model,scaler=load_files()
+    model,scaler=load_model()
 
-except:
+except Exception as e:
 
     st.error(
-"""
-Required Files Missing
+    f"Model Loading Error : {e}"
+    )
 
-Place:
-
-• titanic_ann_model.keras
-
-• scaler.pkl
-
-inside project folder
-"""
-)
     st.stop()
 
-# ==================================
-# SIDEBAR MENU
-# ==================================
-
-st.sidebar.image(
-"https://cdn-icons-png.flaticon.com/512/2784/2784487.png",
-width=100
-)
+# =====================================================
+# SIDEBAR
+# =====================================================
 
 st.sidebar.title(
 "Navigation"
@@ -99,81 +91,94 @@ st.sidebar.title(
 
 menu=st.sidebar.radio(
 
-"Go To",
+"Menu",
 
 [
 "🏠 Home",
+
 "📖 Project Info",
+
 "🚢 Prediction",
+
 "🧠 Model Details"
+
 ]
 
 )
 
-# ==================================
+# =====================================================
 # HOME
-# ==================================
+# =====================================================
 
 if menu=="🏠 Home":
 
     st.markdown(
-"""
+
+    """
+
 <div class='title'>
-🚢 Titanic Survival Prediction
+
+🚢 Titanic Survival Prediction System
+
 </div>
+
 """,
+
 unsafe_allow_html=True
+
 )
 
     st.markdown(
+
 """
 <div class='subtitle'>
-Deep Learning Based Passenger Survival Prediction System
+
+Deep Learning Based Passenger Survival Prediction
+
 </div>
 """,
+
 unsafe_allow_html=True
+
 )
 
     st.divider()
 
-    col1,col2=st.columns([2,1])
+    c1,c2,c3=st.columns(3)
 
-    with col1:
+    c1.metric(
+    "Framework",
+    "TensorFlow"
+    )
 
-        st.success(
+    c2.metric(
+    "Model",
+    "ANN"
+    )
+
+    c3.metric(
+    "Features",
+    "3"
+    )
+
+    st.success(
+
 """
-Predict passenger survival using
+AI powered prediction system using
 
-✔ Artificial Neural Network
+✔ TensorFlow
 
-✔ TensorFlow Deep Learning
+✔ ANN
 
-✔ Streamlit Deployment
+✔ Streamlit
 
-✔ AI Powered Prediction
+✔ Deep Learning
 """
 )
 
-    with col2:
-
-        st.metric(
-        "Model Type",
-        "ANN"
-        )
-
-        st.metric(
-        "Features",
-        "3"
-        )
-
-        st.metric(
-        "Framework",
-        "TensorFlow"
-        )
-
-# ==================================
+# =====================================================
 # PROJECT INFO
-# ==================================
+# =====================================================
 
 elif menu=="📖 Project Info":
 
@@ -182,13 +187,13 @@ elif menu=="📖 Project Info":
     )
 
     st.info(
+
 """
 Purpose:
 
-Predict passenger survival probability
-during emergency situations.
+Predict passenger survival.
 
-Features Used:
+Features:
 
 • Passenger Class
 
@@ -198,7 +203,7 @@ Features Used:
 
 Workflow:
 
-Input Data
+Input
 
 ↓
 
@@ -218,66 +223,43 @@ Visualization
 """
 )
 
-# ==================================
+# =====================================================
 # MODEL DETAILS
-# ==================================
+# =====================================================
 
 elif menu=="🧠 Model Details":
 
     st.header(
-    "Neural Network Architecture"
+    "ANN Architecture"
     )
 
-    st.write(
-"""
-Input Layer → 3 Neurons
-
-Hidden Layer → Dense Layer
-
-Activation → ReLU
-
-Output Layer → Sigmoid
-
-Loss Function:
-
-Binary Crossentropy
-
-Optimizer:
-
-Adam
-
-Framework:
-
-TensorFlow / Keras
-"""
-)
-
     st.code(
+
 """
-Input(3)
+Input Layer : 3
 
-↓
+Hidden Layer 1 : Dense(16)
 
-Dense(16,activation='relu')
+Activation : ReLU
 
-↓
+Hidden Layer 2 : Dense(8)
 
-Dense(8,activation='relu')
+Activation : ReLU
 
-↓
+Output Layer : Dense(1)
 
-Dense(1,activation='sigmoid')
+Activation : Sigmoid
 """
 )
 
-# ==================================
-# PREDICTION PAGE
-# ==================================
+# =====================================================
+# PREDICTION
+# =====================================================
 
 elif menu=="🚢 Prediction":
 
     st.header(
-    "Passenger Information"
+    "Passenger Details"
     )
 
     c1,c2,c3=st.columns(3)
@@ -286,9 +268,9 @@ elif menu=="🚢 Prediction":
 
         pclass=st.selectbox(
 
-            "Passenger Class",
+        "Passenger Class",
 
-            [1,2,3]
+        [1,2,3]
 
         )
 
@@ -296,13 +278,13 @@ elif menu=="🚢 Prediction":
 
         age=st.slider(
 
-            "Age",
+        "Age",
 
-            1,
+        1,
 
-            80,
+        80,
 
-            25
+        25
 
         )
 
@@ -310,13 +292,13 @@ elif menu=="🚢 Prediction":
 
         fare=st.number_input(
 
-            "Fare",
+        "Fare",
 
-            0.0,
+        0.0,
 
-            600.0,
+        600.0,
 
-            100.0
+        100.0
 
         )
 
@@ -324,9 +306,9 @@ elif menu=="🚢 Prediction":
 
     if st.button(
 
-        "Predict Survival",
+    "Predict Survival",
 
-        use_container_width=True
+    use_container_width=True
 
     ):
 
@@ -348,7 +330,7 @@ elif menu=="🚢 Prediction":
         data
         )
 
-        pred=model.predict(
+        prediction=model.predict(
 
         processed,
 
@@ -356,33 +338,37 @@ elif menu=="🚢 Prediction":
 
         )
 
-        prob=float(
-        pred[0][0]
+        probability=float(
+        prediction[0][0]
         )
 
-        non=1-prob
+        non_survival=1-probability
 
         confidence=max(
-        prob,
-        non
+
+        probability,
+
+        non_survival
+
         )
 
-        result=(
-        "Survived ✅"
-        if prob>0.5
-        else
-        "Not Survived ❌"
-        )
+        if probability>0.5:
 
-        st.success(
-        "Prediction Generated"
+            result="Survived ✅"
+
+        else:
+
+            result="Not Survived ❌"
+
+        st.subheader(
+        "Prediction Output"
         )
 
         a,b,c=st.columns(3)
 
         a.metric(
 
-        "Prediction",
+        "Result",
 
         result
 
@@ -390,9 +376,9 @@ elif menu=="🚢 Prediction":
 
         b.metric(
 
-        "Probability",
+        "Survival Probability",
 
-        f"{prob:.2%}"
+        f"{probability:.2%}"
 
         )
 
@@ -405,11 +391,11 @@ elif menu=="🚢 Prediction":
         )
 
         st.write(
-        "Survival Probability"
+        "Probability Meter"
         )
 
         st.progress(
-        prob
+        probability
         )
 
         fig,ax=plt.subplots(
@@ -418,7 +404,13 @@ elif menu=="🚢 Prediction":
 
         ax.pie(
 
-        [prob,non],
+        [
+
+        probability,
+
+        non_survival
+
+        ],
 
         labels=[
 
@@ -428,26 +420,26 @@ elif menu=="🚢 Prediction":
 
         ],
 
-        autopct="%1.1f%%",
-
         colors=[
 
         "green",
 
         "red"
 
-        ]
+        ],
+
+        autopct="%1.1f%%"
 
         )
 
         st.pyplot(fig)
 
-# ==================================
+# =====================================================
 # FOOTER
-# ==================================
+# =====================================================
 
 st.sidebar.markdown("---")
 
-st.sidebar.caption(
-"AI Deep Learning Project"
+st.sidebar.success(
+"ANN Deployment Successful"
 )
