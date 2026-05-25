@@ -4,211 +4,450 @@ import numpy as np
 import joblib
 import matplotlib.pyplot as plt
 
-# ==========================================
-# PAGE CONFIGURATION
-# ==========================================
+# ==================================
+# PAGE CONFIG
+# ==================================
 
 st.set_page_config(
-    page_title="Titanic Survival Prediction",
+    page_title="Titanic AI Prediction",
     page_icon="🚢",
     layout="wide"
 )
 
-# ==========================================
-# LOAD MODEL AND SCALER
-# ==========================================
+# ==================================
+# CUSTOM STYLING
+# ==================================
 
-model = tf.keras.models.load_model(
-    "titanic_ann_model.keras"
-)
+st.markdown("""
+<style>
 
-scaler = joblib.load(
-    "scaler.pkl"
-)
+.main{
+background-color:#0E1117;
+}
 
-# ==========================================
-# HEADER SECTION
-# ==========================================
+.title{
+font-size:40px;
+font-weight:bold;
+color:#00D4FF;
+}
 
-st.markdown(
+.subtitle{
+font-size:18px;
+color:#C0C0C0;
+}
+
+.card{
+padding:20px;
+border-radius:15px;
+background-color:#1E1E1E;
+box-shadow:2px 2px 8px gray;
+}
+
+</style>
+""",unsafe_allow_html=True)
+
+# ==================================
+# LOAD MODEL
+# ==================================
+
+@st.cache_resource
+def load_files():
+
+    model=tf.keras.models.load_model(
+        "titanic_ann_model.keras"
+    )
+
+    scaler=joblib.load(
+        "scaler.pkl"
+    )
+
+    return model,scaler
+
+try:
+
+    model,scaler=load_files()
+
+except:
+
+    st.error(
 """
-# 🚢 Titanic Survival Prediction System
+Required Files Missing
 
-### Deep Learning Based Passenger Survival Prediction
+Place:
+
+• titanic_ann_model.keras
+
+• scaler.pkl
+
+inside project folder
+"""
+)
+    st.stop()
+
+# ==================================
+# SIDEBAR MENU
+# ==================================
+
+st.sidebar.image(
+"https://cdn-icons-png.flaticon.com/512/2784/2784487.png",
+width=100
+)
+
+st.sidebar.title(
+"Navigation"
+)
+
+menu=st.sidebar.radio(
+
+"Go To",
+
+[
+"🏠 Home",
+"📖 Project Info",
+"🚢 Prediction",
+"🧠 Model Details"
+]
+
+)
+
+# ==================================
+# HOME
+# ==================================
+
+if menu=="🏠 Home":
+
+    st.markdown(
+"""
+<div class='title'>
+🚢 Titanic Survival Prediction
+</div>
+""",
+unsafe_allow_html=True
+)
+
+    st.markdown(
+"""
+<div class='subtitle'>
+Deep Learning Based Passenger Survival Prediction System
+</div>
+""",
+unsafe_allow_html=True
+)
+
+    st.divider()
+
+    col1,col2=st.columns([2,1])
+
+    with col1:
+
+        st.success(
+"""
+Predict passenger survival using
+
+✔ Artificial Neural Network
+
+✔ TensorFlow Deep Learning
+
+✔ Streamlit Deployment
+
+✔ AI Powered Prediction
 """
 )
 
-st.markdown("---")
+    with col2:
 
-# ==========================================
-# PROJECT DESCRIPTION
-# ==========================================
+        st.metric(
+        "Model Type",
+        "ANN"
+        )
 
-with st.container():
+        st.metric(
+        "Features",
+        "3"
+        )
+
+        st.metric(
+        "Framework",
+        "TensorFlow"
+        )
+
+# ==================================
+# PROJECT INFO
+# ==================================
+
+elif menu=="📖 Project Info":
+
+    st.header(
+    "Project Description"
+    )
 
     st.info(
-    """
-This application predicts passenger survival probability
-using an Artificial Neural Network (ANN)
-built using TensorFlow.
+"""
+Purpose:
 
-### Features Used
+Predict passenger survival probability
+during emergency situations.
+
+Features Used:
+
 • Passenger Class
 
 • Age
 
 • Fare
 
-### Model Workflow
+Workflow:
 
-Input Data → Preprocessing → ANN Model → Prediction
+Input Data
+
+↓
+
+Preprocessing
+
+↓
+
+ANN Model
+
+↓
+
+Prediction
+
+↓
+
+Visualization
 """
 )
 
-st.markdown("---")
+# ==================================
+# MODEL DETAILS
+# ==================================
 
-# ==========================================
-# INPUT AREA
-# ==========================================
+elif menu=="🧠 Model Details":
 
-st.subheader("Passenger Information")
-
-col1,col2,col3 = st.columns(3)
-
-with col1:
-
-    pclass = st.selectbox(
-        "Passenger Class",
-        [1,2,3]
+    st.header(
+    "Neural Network Architecture"
     )
 
-with col2:
+    st.write(
+"""
+Input Layer → 3 Neurons
 
-    age = st.slider(
-        "Age",
-        1,
-        80,
-        24
+Hidden Layer → Dense Layer
+
+Activation → ReLU
+
+Output Layer → Sigmoid
+
+Loss Function:
+
+Binary Crossentropy
+
+Optimizer:
+
+Adam
+
+Framework:
+
+TensorFlow / Keras
+"""
+)
+
+    st.code(
+"""
+Input(3)
+
+↓
+
+Dense(16,activation='relu')
+
+↓
+
+Dense(8,activation='relu')
+
+↓
+
+Dense(1,activation='sigmoid')
+"""
+)
+
+# ==================================
+# PREDICTION PAGE
+# ==================================
+
+elif menu=="🚢 Prediction":
+
+    st.header(
+    "Passenger Information"
     )
 
-with col3:
+    c1,c2,c3=st.columns(3)
 
-    fare = st.number_input(
-        "Fare",
-        min_value=0.0,
-        max_value=600.0,
-        value=120.0
-    )
+    with c1:
 
-st.markdown("---")
+        pclass=st.selectbox(
 
-# ==========================================
-# PREDICTION BUTTON
-# ==========================================
+            "Passenger Class",
 
-if st.button("Predict Survival"):
+            [1,2,3]
 
-    user_input = np.array(
+        )
+
+    with c2:
+
+        age=st.slider(
+
+            "Age",
+
+            1,
+
+            80,
+
+            25
+
+        )
+
+    with c3:
+
+        fare=st.number_input(
+
+            "Fare",
+
+            0.0,
+
+            600.0,
+
+            100.0
+
+        )
+
+    st.divider()
+
+    if st.button(
+
+        "Predict Survival",
+
+        use_container_width=True
+
+    ):
+
+        data=np.array(
+
         [[
-            pclass,
-            age,
-            fare
+
+        pclass,
+
+        age,
+
+        fare
+
         ]]
-    )
 
-    # SAME PREPROCESSING
+        )
 
-    processed = scaler.transform(
-        user_input
-    )
+        processed=scaler.transform(
+        data
+        )
 
-    prediction = model.predict(
+        pred=model.predict(
+
         processed,
+
         verbose=0
-    )
 
-    probability = float(
-        prediction[0][0]
-    )
+        )
 
-    non_survival = 1-probability
+        prob=float(
+        pred[0][0]
+        )
 
-    confidence = max(
-        probability,
-        non_survival
-    )
+        non=1-prob
 
-    # PREDICTION LOGIC
+        confidence=max(
+        prob,
+        non
+        )
 
-    if probability > 0.5:
+        result=(
+        "Survived ✅"
+        if prob>0.5
+        else
+        "Not Survived ❌"
+        )
 
-        result = "Survived ✅"
+        st.success(
+        "Prediction Generated"
+        )
 
-    else:
+        a,b,c=st.columns(3)
 
-        result = "Not Survived ❌"
+        a.metric(
 
-    st.subheader("Prediction Results")
-
-    c1,c2,c3 = st.columns(3)
-
-    c1.metric(
         "Prediction",
+
         result
-    )
 
-    c2.metric(
-        "Survival Probability",
-        f"{probability:.2%}"
-    )
+        )
 
-    c3.metric(
+        b.metric(
+
+        "Probability",
+
+        f"{prob:.2%}"
+
+        )
+
+        c.metric(
+
         "Confidence",
+
         f"{confidence:.2%}"
-    )
 
-    st.markdown("---")
+        )
 
-    # =====================================
-    # VISUALIZATION
-    # =====================================
+        st.write(
+        "Survival Probability"
+        )
 
-    st.subheader("Prediction Visualization")
+        st.progress(
+        prob
+        )
 
-    fig,ax = plt.subplots(
+        fig,ax=plt.subplots(
         figsize=(5,5)
-    )
+        )
 
-    labels = [
+        ax.pie(
+
+        [prob,non],
+
+        labels=[
+
         "Survival",
+
         "Non Survival"
-    ]
 
-    values = [
-        probability,
-        non_survival
-    ]
+        ],
 
-    colors = [
-        "green",
-        "red"
-    ]
-
-    ax.pie(
-        values,
-        labels=labels,
         autopct="%1.1f%%",
-        colors=colors
-    )
 
-    st.pyplot(fig)
+        colors=[
 
-# ==========================================
+        "green",
+
+        "red"
+
+        ]
+
+        )
+
+        st.pyplot(fig)
+
+# ==================================
 # FOOTER
-# ==========================================
+# ==================================
 
-st.markdown("---")
+st.sidebar.markdown("---")
 
-st.success(
-"TensorFlow ANN Deployment Successful"
+st.sidebar.caption(
+"AI Deep Learning Project"
 )
